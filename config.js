@@ -3,5 +3,5 @@ window.PRINTMARKS_CONFIG = {
 http://localhost:8080/**",
   SUPABASE_ANON_KEY: "sb_publishable_8Cp6ouI0lmQjLPzxKdrZYA_gjko-YVX",
   DOWNLOAD_URL: "downloads/PrintMarks_Setup.exe",
-  SUPPORT_EMAIL: "support@example.com"
+  SUPPORT_EMAIL: "printmarks0104@gmail.com"
 };
