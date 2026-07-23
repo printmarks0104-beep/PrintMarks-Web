@@ -1,6 +1,7 @@
 window.PRINTMARKS_CONFIG = {
-  SUPABASE_URL: "https://YOUR-PROJECT.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR_PUBLIC_ANON_KEY",
+  SUPABASE_URL: "https://printmarks0104-beep.github.io/PrintMarks-Web/**
+http://localhost:8080/**",
+  SUPABASE_ANON_KEY: "sb_publishable_8Cp6ouI0lmQjLPzxKdrZYA_gjko-YVX",
   DOWNLOAD_URL: "downloads/PrintMarks_Setup.exe",
   SUPPORT_EMAIL: "support@example.com"
 };
