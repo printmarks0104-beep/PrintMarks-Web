@@ -169,6 +169,8 @@ window.PRINTMARKS_CONFIG = {
   let currentUser = null;
   let currentProfile = null;
   let currentAccess = {};
+  let authProviderSettings = null;
+  let googleProviderEnabled = null;
   let activeCheckout = null;
   let lastJobCode = "";
   let checkoutAutoOpened = false;
@@ -194,6 +196,55 @@ window.PRINTMARKS_CONFIG = {
     } catch (_ignored) {
       return fallback;
     }
+  };
+
+  const normalizeAuthError = (error, fallback = "The request could not be completed.") => {
+    const message = friendlyError(error, fallback);
+    const lower = message.toLowerCase();
+    if (lower.includes("provider is not enabled") || lower.includes("unsupported provider")) {
+      return "Google login is not enabled yet. The Developer must enable Google under Supabase Authentication → Sign In / Providers.";
+    }
+    if (lower.includes("database error saving new user") || lower.includes("unexpected_failure")) {
+      return "Supabase could not create this account because an old PrintMarks signup database trigger failed. Run RUN_THIS_IN_SUPABASE_V36_7_0_ACCOUNT_CREATION_REPAIR.sql, then try again.";
+    }
+    if (lower.includes("user already registered") || lower.includes("already been registered")) {
+      return "This email already has a PrintMarks account. Log in or use Forgot password.";
+    }
+    if (lower.includes("rate limit") || lower.includes("email rate limit")) {
+      return "Too many registration or email attempts. Wait at least 60 seconds, then try once.";
+    }
+    return message;
+  };
+
+  const updateGoogleButtons = () => {
+    [$("googleRegisterBtn"), $("googleLoginBtn")].filter(Boolean).forEach((button) => {
+      const unavailable = googleProviderEnabled === false;
+      button.classList.toggle("provider-unavailable", unavailable);
+      button.setAttribute("aria-disabled", unavailable ? "true" : "false");
+      button.title = unavailable
+        ? "Google login must first be enabled in Supabase by the PrintMarks Developer."
+        : "Continue securely with your Google account";
+    });
+  };
+
+  const loadAuthProviderSettings = async (force = false) => {
+    if (!configured) return null;
+    if (authProviderSettings && !force) return authProviderSettings;
+    try {
+      const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
+      const response = await fetch(`${base}/auth/v1/settings`, {
+        headers: { apikey: cfg.SUPABASE_ANON_KEY },
+        cache: "no-store"
+      });
+      if (!response.ok) throw new Error(`Auth settings check failed (${response.status})`);
+      authProviderSettings = await response.json();
+      googleProviderEnabled = authProviderSettings?.external?.google === true;
+    } catch (error) {
+      console.warn("Could not check Google provider status:", error);
+      googleProviderEnabled = null;
+    }
+    updateGoogleButtons();
+    return authProviderSettings;
   };
 
   const requireClient = () => {
@@ -298,41 +349,51 @@ window.PRINTMARKS_CONFIG = {
     if (!requireClient()) return;
     const validation = validateRegistration();
     if (validation) { $("authMessage").textContent = validation; return; }
+    const form = event.currentTarget;
+    const submit = form?.querySelector('button[type="submit"]');
     const email = $("regEmail").value.trim().toLowerCase();
     const payload = registrationPayload();
     $("authMessage").textContent = "Creating your secure account…";
     hide($("confirmationPanel"));
+    if (submit) { submit.disabled = true; submit.textContent = "Creating account…"; }
 
-    const { data, error } = await client.auth.signUp({
-      email,
-      password: $("regPassword").value,
-      options: {
-        emailRedirectTo: portalReturnUrl({ confirmed: "1" }),
-        data: payload
+    try {
+      const { data, error } = await client.auth.signUp({
+        email,
+        password: $("regPassword").value,
+        options: {
+          emailRedirectTo: portalReturnUrl({ confirmed: "1" }),
+          data: payload
+        }
+      });
+      if (error) {
+        $("authMessage").textContent = normalizeAuthError(error, "Account creation failed. Open Supabase Authentication → Logs and inspect the newest /signup request.");
+        return;
       }
-    });
-    if (error) {
-      $("authMessage").textContent = friendlyError(error, "Account creation failed. Check the Supabase Auth log for the exact reason.");
-      return;
-    }
-    if (Array.isArray(data?.user?.identities) && data.user.identities.length === 0) {
-      $("authMessage").textContent = "This email already has a PrintMarks account. Log in or use Forgot password.";
-      switchPane("login");
-      $("loginEmail").value = email;
-      return;
-    }
+      if (Array.isArray(data?.user?.identities) && data.user.identities.length === 0) {
+        $("authMessage").textContent = "This email already has a PrintMarks account. Log in or use Forgot password.";
+        switchPane("login");
+        $("loginEmail").value = email;
+        return;
+      }
 
-    if (data?.session) {
-      await ensureMyProfile(payload);
-      hide($("authModal"));
-      await loadAccount();
-      toast("Account created successfully.");
-      return;
-    }
+      if (data?.session) {
+        currentUser = data.user;
+        await ensureMyProfile(payload);
+        hide($("authModal"));
+        await loadAccount();
+        toast("Account created successfully.");
+        return;
+      }
 
-    sessionStorage.setItem("printmarks.confirmation.email", email);
-    $("authMessage").textContent = "Account created. Open the confirmation link sent to your email. It is a link, not a numeric code.";
-    showConfirmation(email);
+      sessionStorage.setItem("printmarks.confirmation.email", email);
+      $("authMessage").textContent = "Account created. Open the confirmation link sent to your email. It is a link, not a numeric code.";
+      showConfirmation(email);
+    } catch (error) {
+      $("authMessage").textContent = normalizeAuthError(error, "Account creation could not start. Check your internet connection and the Supabase Auth logs.");
+    } finally {
+      if (submit) { submit.disabled = false; submit.textContent = "Create account"; }
+    }
   });
 
   $("resendConfirmationBtn")?.addEventListener("click", async () => {
@@ -381,6 +442,11 @@ window.PRINTMARKS_CONFIG = {
 
   const continueWithGoogle = async (mode) => {
     if (!requireClient()) return;
+    const settings = await loadAuthProviderSettings(true);
+    if (settings && settings?.external?.google !== true) {
+      $("authMessage").textContent = "Google login is not enabled yet. In Supabase open Authentication → Sign In / Providers → Google, enable it, enter the Google Client ID and Secret, then save.";
+      return;
+    }
     if (mode === "register") {
       const validation = validateRegistration();
       if (validation) { $("authMessage").textContent = validation; return; }
@@ -389,14 +455,19 @@ window.PRINTMARKS_CONFIG = {
       localStorage.removeItem(pendingKey);
     }
     $("authMessage").textContent = "Opening Google secure sign-in…";
-    const { error } = await client.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: portalReturnUrl({ oauth: "google" }) }
-    });
-    if (error) $("authMessage").textContent = friendlyError(error, "Google sign-in could not start. Enable the Google provider in Supabase.");
+    try {
+      const { error } = await client.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: portalReturnUrl({ oauth: "google" }) }
+      });
+      if (error) $("authMessage").textContent = normalizeAuthError(error, "Google sign-in could not start.");
+    } catch (error) {
+      $("authMessage").textContent = normalizeAuthError(error, "Google sign-in could not start.");
+    }
   };
   $("googleRegisterBtn")?.addEventListener("click", () => continueWithGoogle("register"));
   $("googleLoginBtn")?.addEventListener("click", () => continueWithGoogle("login"));
+  loadAuthProviderSettings();
 
   async function ensureMyProfile(pending = null) {
     if (!client || !currentUser) return null;
@@ -820,7 +891,6 @@ window.PRINTMARKS_CONFIG = {
   }
   loadShops();
 })();
-
 </script>
 </body>
 </html>
