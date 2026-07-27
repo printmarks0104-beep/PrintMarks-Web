@@ -316,8 +316,11 @@ window.PRINTMARKS_CONFIG = {
   if (incomingCode && $("regReferral")) $("regReferral").value = incomingCode;
   if (location.hash === "#register") setTimeout(() => openAuth("register"), 100);
   if (params.get("desktop") === "1") setTimeout(() => {
-    openAuth(params.get("mode") === "login" ? "login" : "register");
-    if ($("authMessage")) $("authMessage").textContent = "Create or log in with your PrintMarks email and password. Use the same credentials in the Windows app.";
+    const desktopMode = params.get("mode") === "login" ? "login" : "register";
+    openAuth(desktopMode);
+    const incomingEmail = (params.get("email") || "").trim().toLowerCase();
+    if (incomingEmail && desktopMode === "login" && $("loginEmail")) $("loginEmail").value = incomingEmail;
+    if ($("authMessage")) $("authMessage").textContent = "Use your PrintMarks account password here. Your activation code is entered later inside the Windows app; it is not your login password.";
   }, 120);
   if (params.get("confirmed") === "1") setTimeout(() => { openAuth("login"); $("authMessage").textContent = "Email confirmed successfully. Log in to start using PrintMarks."; }, 150);
   if (params.get("popup") === "1" && window.opener) {
@@ -1128,15 +1131,30 @@ window.PRINTMARKS_CONFIG = {
   }
 
   if (client) {
-    client.auth.onAuthStateChange((_event, session) => {
+    client.auth.onAuthStateChange((event, session) => {
       currentUser = session?.user || null;
-      setTimeout(() => { if (currentUser) loadAccount(); else { hide($("account")); hide($("developerPortal")); hide($("partnerPortal")); } }, 0);
+      setTimeout(async () => {
+        if (currentUser) {
+          await loadAccount();
+          if (event === "PASSWORD_RECOVERY" || params.get("reset") === "1") {
+            hide($("authModal"));
+            show($("account"));
+            if ($("desktopPasswordMessage")) {
+              $("desktopPasswordMessage").textContent = "Enter and save your new password. Use this same password in the Windows app.";
+            }
+            $("desktopPasswordCard")?.classList.remove("hidden");
+            setTimeout(() => $("desktopPasswordCard")?.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
+            toast("Password recovery verified. Set your new Windows login password below.");
+          }
+        } else {
+          hide($("account")); hide($("developerPortal")); hide($("partnerPortal"));
+        }
+      }, 0);
     });
     client.auth.getSession().then(({ data }) => { if (data.session) loadAccount(); });
   }
   loadShops();
 })();
-
 </script>
 </body>
 </html>
