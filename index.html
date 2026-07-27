@@ -40,7 +40,9 @@ footer{background:#06101d;color:#fff;padding:45px max(28px,calc((100vw - 1220px)
 /* V36.7 account and portal polish */
 .modal-card h2{margin:4px 0 18px;font-size:30px}.modal-card form>.primary{width:100%;min-height:47px}.switch{text-align:center;color:#64748b}.switch button,.link-button{border:0;background:transparent;color:#2563eb;font-weight:900;padding:4px}.link-button{display:block;margin:4px auto 0}.google-g{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0);color:#fff;font-weight:950}.confirmation-panel{margin-top:15px;padding:15px;border:1px solid #bfd6fa;border-radius:14px;background:#eff6ff;color:#1e3a5f}.confirmation-panel b{display:block;line-height:1.45}.confirmation-panel p{color:#64748b;font-size:12px;line-height:1.5}.confirmation-panel .secondary{width:100%}.form-message:empty{min-height:0}.form-message{white-space:pre-wrap;line-height:1.45}.portal-shell h3{margin:26px 0 12px}.review-card .primary,.review-card .danger{padding:9px 12px}.demo-work small{color:#64748b}.app-demo-content p{color:#64748b;line-height:1.6}.payment-reference>span{color:#64748b;font-size:12px}.footer-brand{margin-bottom:10px}
 
-  </style>
+  
+  .compact-password-form{display:grid;gap:8px;margin-top:10px}.compact-password-form input{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:10px;padding:10px;background:#fff;color:#0f172a}.compact-password-form .mini{width:100%;margin-top:0}
+</style>
   <script>
 window.PRINTMARKS_CONFIG = {
   SUPABASE_URL: "https://lbxowimckjbmqfobjqlw.supabase.co",
@@ -127,7 +129,7 @@ window.PRINTMARKS_CONFIG = {
     <form class="job-form" id="printJobForm"><div class="form-grid two"><label>Printing shop<select id="jobShop" required></select></label><label>Pickup name<input id="jobPickupName" required></label></div><div class="form-grid four"><label>Service<select id="jobService"><option value="document_print">Document printing</option><option value="photo_print">Photo printing</option><option value="rush_id">Rush ID / Passport</option><option value="sticker">Sticker printing</option><option value="tarpaulin">Tarpaulin</option><option value="other">Other service</option></select></label><label>Paper / size<input id="jobPaper" placeholder="A4, 4R, 2×2, custom…"></label><label>Color mode<select id="jobColor"><option>Auto</option><option>Black & White</option><option>Colored</option></select></label><label>Copies<input id="jobCopies" type="number" min="1" value="1"></label></div><div class="form-grid two"><label>Phone<input id="jobPhone"></label><label>Finishing<input id="jobFinishing" placeholder="Laminate, cut, bind…"></label></div><label>Instructions<textarea id="jobInstructions" rows="4" placeholder="Add deadline, layout, paper, or pickup instructions."></textarea></label><div class="form-grid two"><label class="check"><input id="jobDuplex" type="checkbox"> Print back-to-back</label><label class="check"><input id="jobPayShop" type="checkbox" checked> Pay at the shop</label></div><div class="upload-zone" id="uploadZone"><input id="jobFiles" type="file" multiple required><b>Drop files here or click to browse</b><span>PDF, DOCX, XLSX, images, and other supported print files</span><div class="selected-files" id="selectedFiles"></div></div><div class="job-submit-row"><div><b>Review before submitting</b><span>The selected shop will confirm price and production details.</span></div><button class="primary large" id="submitJobBtn">Submit Print Job</button></div><p class="form-message" id="jobFormMessage"></p></form>
   </div></section>
 
-  <section class="section hidden" id="account"><div class="account-head"><div><span class="eyebrow">MY PRINTMARKS</span><h2 id="accountGreeting">Welcome</h2><p id="accountTypeLabel"></p></div><button class="secondary" id="logoutBtn">Log out</button></div><div class="dashboard-grid"><article class="dashboard-card"><span>Subscription</span><b id="subscriptionStatus">Checking…</b><small id="subscriptionExpiry"></small></article><article class="dashboard-card"><span>Referral code</span><b id="referralCode">—</b><button class="mini" id="copyReferralBtn">Copy link</button></article><article class="dashboard-card"><span>Qualified referrals</span><b><span id="qualifiedCount">0</span> / <span id="nextMilestone">20</span></b><div class="progress"><i id="referralProgress"></i></div></article><article class="dashboard-card"><span>Bonus access</span><b><span id="bonusDays">0</span> days</b><small>30 days per completed milestone</small></article></div><div class="account-actions"><a class="primary" data-download>Download PrintMarks Setup</a><button class="secondary" id="accountResellerBtn">Apply as Partner</button></div><div class="my-jobs-head"><h2>My submitted jobs</h2><button class="secondary" id="refreshJobsBtn">Refresh</button></div><div class="jobs-list" id="myJobs"><div class="empty-state">No print jobs submitted yet.</div></div></section>
+  <section class="section hidden" id="account"><div class="account-head"><div><span class="eyebrow">MY PRINTMARKS</span><h2 id="accountGreeting">Welcome</h2><p id="accountTypeLabel"></p></div><button class="secondary" id="logoutBtn">Log out</button></div><div class="dashboard-grid"><article class="dashboard-card"><span>Subscription</span><b id="subscriptionStatus">Checking…</b><small id="subscriptionExpiry"></small></article><article class="dashboard-card"><span>Referral code</span><b id="referralCode">—</b><button class="mini" id="copyReferralBtn">Copy link</button></article><article class="dashboard-card"><span>Qualified referrals</span><b><span id="qualifiedCount">0</span> / <span id="nextMilestone">20</span></b><div class="progress"><i id="referralProgress"></i></div></article><article class="dashboard-card"><span>Bonus access</span><b><span id="bonusDays">0</span> days</b><small>30 days per completed milestone</small></article><article class="dashboard-card hidden" id="desktopPasswordCard"><span>Windows app access</span><b>Set Desktop App Password</b><small>After Google signup, use <strong id="desktopAccountEmail">your Gmail</strong> plus this password in PrintMarks Windows.</small><form id="desktopPasswordForm" class="compact-password-form"><input id="desktopPassword" type="password" minlength="8" autocomplete="new-password" placeholder="New desktop password" required><input id="desktopPasswordConfirm" type="password" minlength="8" autocomplete="new-password" placeholder="Confirm desktop password" required><button class="mini" type="submit">Save desktop password</button></form><small id="desktopPasswordMessage"></small></article></div><div class="account-actions"><a class="primary" data-download>Download PrintMarks Setup</a><button class="secondary" id="accountResellerBtn">Apply as Partner</button></div><div class="my-jobs-head"><h2>My submitted jobs</h2><button class="secondary" id="refreshJobsBtn">Refresh</button></div><div class="jobs-list" id="myJobs"><div class="empty-state">No print jobs submitted yet.</div></div></section>
 
   <section class="portal-shell hidden" id="developerPortal"><div class="portal-head"><div><span class="eyebrow">SERVER-AUTHORIZED OWNER ACCESS</span><h2>PrintMarks Developer Console</h2><p id="developerMessage">Loading secure Developer data…</p></div><button class="secondary" id="refreshDeveloperMetrics">Refresh console</button></div><div class="portal-metrics" id="developerMetrics"></div><h3>Manual payments awaiting review</h3><div class="payment-review-list" id="developerPayments"></div><h3>Partner applications awaiting review</h3><div class="payment-review-list" id="developerPartners"></div></section>
 
@@ -174,6 +176,8 @@ window.PRINTMARKS_CONFIG = {
   let activeCheckout = null;
   let lastJobCode = "";
   let checkoutAutoOpened = false;
+  let googlePopup = null;
+  let googlePopupPoll = null;
 
   const toast = (text) => {
     const el = $("toast");
@@ -302,7 +306,23 @@ window.PRINTMARKS_CONFIG = {
   const incomingCode = (params.get("ref") || params.get("reseller") || "").toUpperCase();
   if (incomingCode && $("regReferral")) $("regReferral").value = incomingCode;
   if (location.hash === "#register") setTimeout(() => openAuth("register"), 100);
+  if (params.get("desktop") === "1") setTimeout(() => {
+    openAuth(params.get("mode") === "login" ? "login" : "register");
+    if ($("authMessage")) $("authMessage").textContent = "Sign in with Google, then set a Desktop App Password in your account so the Windows app can authenticate securely.";
+  }, 120);
   if (params.get("confirmed") === "1") setTimeout(() => { openAuth("login"); $("authMessage").textContent = "Email confirmed successfully. Log in to start using PrintMarks."; }, 150);
+  if (params.get("popup") === "1" && window.opener) {
+    const closeWhenReady = setInterval(async () => {
+      if (!client) return;
+      const { data } = await client.auth.getSession();
+      if (data?.session?.user) {
+        clearInterval(closeWhenReady);
+        try { window.opener.postMessage({ type: "printmarks-google-auth-complete" }, window.location.origin); } catch (_ignored) {}
+        setTimeout(() => window.close(), 250);
+      }
+    }, 250);
+    setTimeout(() => clearInterval(closeWhenReady), 30000);
+  }
 
   const accountTypeChanged = () => {
     const isShop = $("regAccountType")?.value === "shop";
@@ -440,6 +460,43 @@ window.PRINTMARKS_CONFIG = {
     $("authMessage").textContent = error ? friendlyError(error) : "Password-reset link sent. Check Inbox, Spam, and Promotions.";
   });
 
+  const finishGooglePopupLogin = async (mode) => {
+    const { data: sessionData } = await client.auth.getSession();
+    if (!sessionData?.session?.user) return false;
+    currentUser = sessionData.session.user;
+    const pending = mode === "register" ? consumePendingRegistration() : null;
+    await ensureMyProfile(pending);
+    hide($("authModal"));
+    await loadAccount();
+    toast(mode === "register" ? "Google account created successfully." : "Signed in securely with Google.");
+    if (params.get("desktop") === "1") {
+      setTimeout(() => {
+        $("desktopPasswordCard")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        toast("Set a Desktop App Password below, then use your Gmail and that password in PrintMarks Windows.");
+      }, 400);
+    }
+    return true;
+  };
+
+  const watchGooglePopup = (mode) => {
+    clearInterval(googlePopupPoll);
+    let checks = 0;
+    googlePopupPoll = setInterval(async () => {
+      checks += 1;
+      if (await finishGooglePopupLogin(mode)) {
+        clearInterval(googlePopupPoll);
+        try { googlePopup?.close(); } catch (_ignored) {}
+        googlePopup = null;
+        return;
+      }
+      if (!googlePopup || googlePopup.closed || checks >= 180) {
+        clearInterval(googlePopupPoll);
+        googlePopup = null;
+        if (checks >= 180) $("authMessage").textContent = "Google sign-in timed out. Close extra Google windows and try again.";
+      }
+    }, 700);
+  };
+
   const continueWithGoogle = async (mode) => {
     if (!requireClient()) return;
     const settings = await loadAuthProviderSettings(true);
@@ -454,13 +511,40 @@ window.PRINTMARKS_CONFIG = {
     } else {
       localStorage.removeItem(pendingKey);
     }
-    $("authMessage").textContent = "Opening Google secure sign-in…";
+
+    $("authMessage").textContent = "Opening the secure Google account chooser…";
     try {
-      const { error } = await client.auth.signInWithOAuth({
+      const { data, error } = await client.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: portalReturnUrl({ oauth: "google" }) }
+        options: {
+          redirectTo: portalReturnUrl({ oauth: "google", popup: "1", desktop: params.get("desktop") || "0" }),
+          skipBrowserRedirect: true,
+          queryParams: { prompt: "select_account" }
+        }
       });
-      if (error) $("authMessage").textContent = normalizeAuthError(error, "Google sign-in could not start.");
+      if (error) {
+        $("authMessage").textContent = normalizeAuthError(error, "Google sign-in could not start.");
+        return;
+      }
+      if (!data?.url) {
+        $("authMessage").textContent = "Google did not return a secure sign-in URL. Verify the provider configuration in Supabase.";
+        return;
+      }
+      const width = 520;
+      const height = 680;
+      const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+      const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+      googlePopup = window.open(
+        data.url,
+        "printmarks-google-signin",
+        `popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      );
+      if (!googlePopup) {
+        $("authMessage").textContent = "The browser blocked the Google popup. Allow popups for this site, then try again.";
+        return;
+      }
+      googlePopup.focus();
+      watchGooglePopup(mode);
     } catch (error) {
       $("authMessage").textContent = normalizeAuthError(error, "Google sign-in could not start.");
     }
@@ -468,6 +552,10 @@ window.PRINTMARKS_CONFIG = {
   $("googleRegisterBtn")?.addEventListener("click", () => continueWithGoogle("register"));
   $("googleLoginBtn")?.addEventListener("click", () => continueWithGoogle("login"));
   loadAuthProviderSettings();
+  window.addEventListener("message", async (event) => {
+    if (event.origin !== window.location.origin || event.data?.type !== "printmarks-google-auth-complete") return;
+    await finishGooglePopupLogin(localStorage.getItem(pendingKey) ? "register" : "login");
+  });
 
   async function ensureMyProfile(pending = null) {
     if (!client || !currentUser) return null;
@@ -567,12 +655,36 @@ window.PRINTMARKS_CONFIG = {
       toast("Referral link copied.");
     };
 
+    const desktopEligible = ["shop", "owner", "reseller", "partner", "developer"].includes(String(profile?.account_type || "").toLowerCase()) || currentAccess.is_developer || currentAccess.is_partner;
+    $("desktopPasswordCard")?.classList.toggle("hidden", !desktopEligible);
+    if ($("desktopAccountEmail")) $("desktopAccountEmail").textContent = user.email || "your Google email";
+
     await Promise.all([loadMyJobs(), loadDeveloperPortal(), loadPartnerPortal()]);
     if (pendingCheckoutPlan && !checkoutAutoOpened && !currentAccess.is_developer && !currentAccess.is_partner) {
       checkoutAutoOpened = true;
       await startCheckout(pendingCheckoutPlan, pendingCheckoutMethod);
     }
   }
+
+  $("desktopPasswordForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!client || !currentUser) return;
+    const password = $("desktopPassword").value;
+    const confirm = $("desktopPasswordConfirm").value;
+    const message = $("desktopPasswordMessage");
+    if (password.length < 8) { message.textContent = "Use at least 8 characters."; return; }
+    if (password !== confirm) { message.textContent = "The two passwords do not match."; return; }
+    const button = event.currentTarget.querySelector('button[type="submit"]');
+    button.disabled = true;
+    message.textContent = "Saving your secure desktop password…";
+    const { error } = await client.auth.updateUser({ password });
+    button.disabled = false;
+    if (error) { message.textContent = normalizeAuthError(error, "Desktop password could not be saved."); return; }
+    $("desktopPassword").value = "";
+    $("desktopPasswordConfirm").value = "";
+    message.textContent = `Ready. In the Windows app, log in with ${currentUser.email} and this password.`;
+    toast("Desktop app password saved.");
+  });
 
   $("logoutBtn")?.addEventListener("click", async () => {
     if (client) await client.auth.signOut();
@@ -891,6 +1003,7 @@ window.PRINTMARKS_CONFIG = {
   }
   loadShops();
 })();
+
 </script>
 </body>
 </html>
